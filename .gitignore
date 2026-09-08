@@ -1,0 +1,15 @@
+node_modules
+.venv
+.pytest_cache
+__pycache__/
+*.pyc
+.env
+.output
+.wxt
+coverage
+playwright-report
+test-results
+agent-data
+*.log
+web-ext.config.ts
+.DS_Store

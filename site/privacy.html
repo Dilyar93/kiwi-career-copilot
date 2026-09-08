@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en-NZ">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Privacy — Kiwi Job Search Enhancer</title><link rel="stylesheet" href="style.css"></head>
+  <body>
+    <header><nav aria-label="Primary"><a href="index.html">Product</a><a href="privacy.html" aria-current="page">Privacy</a><a href="support.html">Support</a><a href="terms.html">Terms</a><a href="changelog.html">Changelog</a></nav></header>
+    <main><h1>Privacy notice</h1><p class="notice">Effective 7 August 2026. Kiwi Job Search Enhancer is an independently published, local-first browser extension.</p>
+      <h2>What the extension processes</h2><p>It reads job-card text and links already displayed in the current supported results page so it can apply your filters. It does not request listing APIs, job detail pages or later result pages.</p>
+      <h2>What stays local</h2><ul><li>Rules and profiles in browser local storage.</li><li>Dismissed and viewed job metadata in local IndexedDB.</li><li>Your rounded commute origin and its uncertainty in local storage.</li><li>Adapter diagnostics containing counts and status, not page HTML.</li></ul>
+      <h2>Browser sync</h2><p>Only language and ordinary display preferences use browser sync. Rules, job history and commute coordinates are excluded.</p>
+      <h2>Location</h2><p>Geolocation is requested only after you press “Use my current location”. Coordinates are rounded to three decimal places. The extension does not watch, upload or remotely geocode your location.</p>
+      <h2>Sharing, analytics and advertising</h2><p>The extension has no operator server, analytics, advertising, affiliate tracking or sale of user data. Opening an original job link is ordinary navigation to that platform under its own privacy terms.</p>
+      <h2>Export</h2><p>Settings exports are user initiated. Commute coordinates are excluded unless the user separately opts in.</p>
+      <h2>Deletion and retention</h2><p>Use “Clear local data” to remove local rules, coordinates, diagnostics and job history. Old viewed records are automatically cleaned after the configured local retention period. See the <a href="data-deletion.html">data-deletion instructions</a>.</p>
+      <h2>Permissions</h2><p><code>storage</code> keeps the data described above; <code>sidePanel</code> hosts controls; <code>geolocation</code> supports the click-initiated location feature. Static content scripts are limited to the two declared job-search URL patterns.</p>
+      <h2>Chrome Web Store Limited Use</h2><p>The use of information received from browser APIs adheres to the Chrome Web Store User Data Policy, including the Limited Use requirements.</p>
+      <h2>Contact and changes</h2><p>For support, privacy or security requests, use the publisher contact shown on the Chrome Web Store listing or see <a href="contact.html">Contact</a>. Material changes to data handling require an updated notice and changelog.</p>
+    </main><footer><a href="attribution.html">Attribution</a> · <a href="known-limitations.html">Known limitations</a></footer>
+  </body>
+</html>

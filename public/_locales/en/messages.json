@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Kiwi Career Copilot"
+  },
+  "extDescription": {
+    "message": "A local-first SEEK copilot for focused search, job decisions and application preparation."
+  },
+  "openSidePanel": {
+    "message": "Open Kiwi Career Copilot"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "nz-locations",
+  "countryCode": "NZ",
+  "format": "jobfilter-location-manifest",
+  "schemaVersion": 1,
+  "version": "ArcGIS dataLastEditDate 2026-07-13T10:00:35.773Z; downloaded 2026-08-07",
+  "generatedAt": "2026-08-07T00:00:00.000Z",
+  "attribution": "Contains data sourced from Toitū Te Whenua Land Information New Zealand, licensed for reuse under CC BY 4.0.",
+  "sources": [
+    {
+      "name": "LINZ NZ Suburbs and Localities (layer 113764)",
+      "url": "https://data.linz.govt.nz/layer/113764-nz-suburbs-and-localities/",
+      "serviceUrl": "https://services.arcgis.com/xdsHIIxuCWByZiCB/ArcGIS/rest/services/LINZ_NZ_Suburbs_and_Localities/FeatureServer/0",
+      "version": "ArcGIS dataLastEditDate 2026-07-13T10:00:35.773Z; downloaded 2026-08-07",
+      "downloadedAt": "2026-08-07T00:00:00.000Z",
+      "licence": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "sha256": "93090693b949f3e7250a8283407a3f712dd6f9f6c4845c2bd5e9242854635bf1",
+      "hashMethod": "SHA-256 of the ordered GeoJSON page bytes concatenated without separators"
+    }
+  ],
+  "sourceRecordCount": 6562,
+  "excludedRecordCount": 2314,
+  "locationCount": 4835
+}

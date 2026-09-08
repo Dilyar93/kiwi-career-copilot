@@ -1,0 +1,46 @@
+{
+  "name": "job-filter-extension",
+  "description": "Local-first SEEK career copilot for job decisions, application materials, and focused search controls.",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "packageManager": "pnpm@11.20.0",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "build:edge": "wxt build -b edge",
+    "build:locations": "node scripts/build-nz-location-dataset.mjs",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "store:assets": "node scripts/capture-chrome-store-assets.mjs",
+    "release:check": "node scripts/check-release.mjs",
+    "package:chrome": "wxt zip",
+    "package:edge": "wxt zip -b edge",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "idb": "^8.0.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@wxt-dev/module-react": "^1.2.2",
+    "eslint": "^10.8.0",
+    "fake-indexeddb": "^6.2.5",
+    "globals": "^17.1.0",
+    "happy-dom": "^20.11.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.66.0",
+    "vitest": "^4.1.10",
+    "web-ext": "^10.5.0",
+    "wxt": "^0.21.3"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Kiwi 求职助手"
+  },
+  "extDescription": {
+    "message": "一款本地优先的 SEEK 求职助手，帮助筛选岗位、做申请决策并准备材料。"
+  },
+  "openSidePanel": {
+    "message": "打开 Kiwi 求职助手"
+  }
+}

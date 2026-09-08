@@ -1,0 +1,105 @@
+{
+  "sourceRecordCount": 6562,
+  "outputLocationCount": 4835,
+  "sourceTypeCounts": {
+    "Coastal Bay": 1851,
+    "Island": 1072,
+    "Locality": 2002,
+    "Inland Bay": 289,
+    "Suburb": 1174,
+    "Lake": 121,
+    "Conservation Land": 53
+  },
+  "regionCoverage": {
+    "Northland": {
+      "representative": "Whangārei",
+      "covered": true
+    },
+    "Auckland": {
+      "representative": "Auckland",
+      "covered": true
+    },
+    "Waikato": {
+      "representative": "Hamilton",
+      "covered": true
+    },
+    "Bay of Plenty": {
+      "representative": "Tauranga",
+      "covered": true
+    },
+    "Gisborne": {
+      "representative": "Gisborne",
+      "covered": true
+    },
+    "Hawke's Bay": {
+      "representative": "Napier",
+      "covered": true
+    },
+    "Taranaki": {
+      "representative": "New Plymouth",
+      "covered": true
+    },
+    "Manawatū-Whanganui": {
+      "representative": "Palmerston North",
+      "covered": true
+    },
+    "Wellington": {
+      "representative": "Wellington",
+      "covered": true
+    },
+    "Tasman": {
+      "representative": "Richmond",
+      "covered": true
+    },
+    "Nelson": {
+      "representative": "Nelson",
+      "covered": true
+    },
+    "Marlborough": {
+      "representative": "Blenheim",
+      "covered": true
+    },
+    "West Coast": {
+      "representative": "Greymouth",
+      "covered": true
+    },
+    "Canterbury": {
+      "representative": "Christchurch",
+      "covered": true
+    },
+    "Otago": {
+      "representative": "Dunedin",
+      "covered": true
+    },
+    "Southland": {
+      "representative": "Invercargill",
+      "covered": true
+    }
+  },
+  "islandCoverage": {
+    "northIsland": true,
+    "southIsland": true,
+    "rakiura": true,
+    "chathamIslands": true
+  },
+  "rawBytes": 297129063,
+  "compactBytes": 1549276,
+  "buildMilliseconds": 4499.4,
+  "queryBenchmark": {
+    "repetitions": 1000,
+    "coldIndexMilliseconds": 51.74,
+    "typicalQuery": {
+      "input": "Hamilton Central, Waikato",
+      "milliseconds": 1.91
+    },
+    "duplicateNameQuery": {
+      "input": "Richmond",
+      "milliseconds": 0.5
+    }
+  },
+  "runtime": {
+    "node": "v24.18.0",
+    "platform": "linux",
+    "architecture": "x64"
+  }
+}
