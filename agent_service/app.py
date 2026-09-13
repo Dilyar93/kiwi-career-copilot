@@ -176,9 +176,9 @@ def candidate_document_error(error: CandidateDocumentError) -> HTTPException:
             "Choose a PDF, DOCX, Markdown, or plain-text file",
             415,
         ),
-        "too-large": (
-            "CANDIDATE_FILE_TOO_LARGE",
-            "The candidate document is too large",
+        "limit-exceeded": (
+            "CANDIDATE_DOCUMENT_LIMIT_EXCEEDED",
+            "The candidate document exceeds an import limit",
             413,
         ),
         "no-text": (

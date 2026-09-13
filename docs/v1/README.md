@@ -25,6 +25,8 @@ V1 面向 SEEK 搜索结果列表，提供：
 
 完整版本快照包括 [产品定义](product.md)、[实际架构](architecture.md) 和 [实现回顾](implementation-review.md)。原始文档保存在 [archive](archive/README.md)，仅供追溯。
 
+当前线上 V1 对应的[商店文案与截图](../../store/chrome/README.md)和[公开支持与政策页面](../../site/README.md)继续保留，用于维护线上版本；它们不是当前 V2 源码的发布说明。
+
 ## 对 V2 的约束
 
 - SEEK 现有筛选能力不能因 V2 改造而回归。

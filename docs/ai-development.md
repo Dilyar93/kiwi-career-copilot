@@ -45,15 +45,18 @@ V2 应持续维护：
 
 最小读取顺序：
 
-1. `docs/README.md`
-2. `docs/v2/README.md`
-3. `docs/v2/current-state.md`
-4. 与任务相关的 `product.md`、`roadmap.md` 或 `architecture.md`
-5. 实际代码、tests 和配置
+1. 仓库工具自动提供的根 `AGENTS.md`
+2. `docs/README.md`
+3. `docs/v2/README.md`
+4. `docs/v2/current-state.md`
+5. 与任务相关的 `product.md`、`roadmap.md`、`architecture.md`、`experience.md` 或 `quality.md`
+6. 实际代码、tests 和配置
 
 只有遇到“为什么以前这么写”时才读 `decisions.md`；只有需要核对历史原文时才读 `archive/`。
 
 任何实现计划必须同时引用：用户结果、当前代码事实、所属阶段和退出条件。不能只从旧企划或一段聊天内容开始编码。
+
+阅读顺序用于建立上下文，文档权威顺序用于处理冲突，两者不是同一概念。仓库早期主要是本地修改，Git 历史不能用于还原原始设计或覆盖当前 living docs。
 
 ## 4. Agent-native 核心原则
 

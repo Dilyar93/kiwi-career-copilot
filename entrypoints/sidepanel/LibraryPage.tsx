@@ -36,7 +36,8 @@ const sourceKindIcons: Record<CandidateSourceSummary['kind'], string> = {
 };
 const MAX_CANDIDATE_DOCUMENT_BYTES = 2 * 1024 * 1024;
 const candidateImportErrorLabels: Partial<Record<AgentApiError['code'], TranslationKey>> = {
-  'import-unsupported': 'libraryImportUnsupported', 'import-too-large': 'libraryImportTooLarge',
+  'import-unsupported': 'libraryImportUnsupported',
+  'import-document-limit': 'libraryImportLimitExceeded',
   'import-no-text': 'libraryImportNoText', 'import-unreadable': 'libraryImportUnreadable',
   'import-timeout': 'libraryImportTimeout', 'import-limit': 'libraryImportFailed',
   'import-model-error': 'libraryImportFailed', unauthorized: 'agentUnauthorized',
@@ -180,7 +181,7 @@ export default function LibraryPage({ onOpenSettings }: { onOpenSettings(): void
     setMessage('');
     if (!file) return;
     if (file.size > MAX_CANDIDATE_DOCUMENT_BYTES) {
-      setError(t('libraryImportTooLarge')); return;
+      setError(t('libraryImportLimitExceeded')); return;
     }
     setImportingFileName(file.name); setImporting(true); setError('');
     try {

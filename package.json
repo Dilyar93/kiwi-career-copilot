@@ -14,8 +14,6 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "store:assets": "node scripts/capture-chrome-store-assets.mjs",
-    "release:check": "node scripts/check-release.mjs",
     "package:chrome": "wxt zip",
     "package:edge": "wxt zip -b edge",
     "postinstall": "wxt prepare"

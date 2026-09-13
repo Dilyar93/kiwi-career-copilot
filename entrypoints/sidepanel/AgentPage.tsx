@@ -80,7 +80,7 @@ const analysisErrorLabels: Record<AgentApiError['code'], TranslationKey> = {
   'invalid-job': 'agentInvalidJob',
   'clarification-invalid': 'agentClarificationInvalid',
   'import-unsupported': 'agentAnalysisFailed',
-  'import-too-large': 'agentAnalysisFailed',
+  'import-document-limit': 'agentAnalysisFailed',
   'import-no-text': 'agentAnalysisFailed',
   'import-unreadable': 'agentAnalysisFailed',
   'import-timeout': 'agentAnalysisFailed',

@@ -6,14 +6,16 @@
 
 | 阶段 | 用户结果 | 状态 |
 |---|---|---|
-| 0. Agent 技术纵切 | SEEK 岗位能进入动态 Agent 并保存结构化结果 | 已完成 |
-| 1. 产品基础与交互重设计 | 打开产品就能理解、配置并完成核心任务 | 已完成 |
-| 2. Career Knowledge Base | 从已有多类资料自动建立可追溯职业知识库 | 已完成 |
+| 0. Agent 技术纵切 | SEEK 岗位能进入动态 Agent 并保存结构化结果 | 已完成：技术纵切 |
+| 1. 产品基础与交互重设计 | 打开产品就能理解、配置并完成核心任务 | 已完成：作者走查 |
+| 2. Career Knowledge Base | 从已有多类资料自动建立可追溯职业知识库 | 已完成：作者真实资料走查 |
 | 3. Jobs/Application Workspace | 保存、回看并推进岗位和申请 | 下一阶段，已有后端基础 |
 | 4. 材料与申请闭环 | 管理多个岗位版本并完成真实申请准备 | 首个 Source-first 纵切 |
 | 5. Job Enrichment 与 Career Intelligence | 补全岗位来源并形成长期改进计划 | 未开始 |
 | 6. 可分享本地产品 | 朋友也能安装、配置、使用和恢复 | 未开始 |
 | 7. 最终验证与发布 | 用真实结果评估产品并决定开源/商店发布 | 延后 |
+
+这里的“已完成”表示相应阶段达到 code complete，并由作者完成该阶段用户旅程走查；不表示未参与开发的用户已经独立验证，也不表示 V2 已发布。朋友级安装与首次使用验证属于阶段 6，最终产品评价和发布判断属于阶段 7。
 
 ## 阶段 0：Agent 技术纵切
 
@@ -48,7 +50,7 @@
 
 退出条件：
 
-- 新用户无需阅读 README 就能理解用途、系统状态和首个动作。
+- 在无既有配置的首次使用场景中，不阅读 README 也能从产品内理解用途、系统状态和首个动作。
 - 用户能从当前 SEEK 岗位完成“读取 → 分析 → 理解 → 采取行动”。
 - Agent 要求补充事实时，用户能在当前页面回答并继续，不被卡在只读结果中。
 - Agent 服务/资料未配置时有明确引导，不出现无从下手的空页面。
@@ -63,7 +65,7 @@
 
 CV 解析、原件保存和 Agent 原文搜索是可复用技术基础；真实使用已经证明“固定 Profile 表单为主、CV 导入为辅”的产品模型不成立，旧双轨已删除。
 
-Source、FTS5 chunks、Source-bound Claims、冲突确认、Source-native UI、Agent 自主 Claims/chunks/original 检索与 v7 单轨迁移已经完成。作者已真实走查两份不同用途 CV、Visa、课表、独立项目 Markdown、敏感资料下钻、追问/续跑、恢复和首个材料链路，本阶段关闭。
+Source、FTS5 chunks、Source-bound Claims、冲突确认、Source-native UI、Agent 自主 Claims/chunks/original 检索与 v8 单轨迁移已经完成。作者已真实走查两份不同用途 CV、Visa、课表、独立项目 Markdown、敏感资料下钻、追问/续跑、恢复和首个材料链路，本阶段关闭。
 
 基础 CV 选择、岗位 variant、版本和 FlowCV 式编辑属于阶段 4；GitHub/local folder/ZIP、语义索引和 parent-section 只有出现真实需求时再进入后续资料库扩展，均不再阻塞 Stage 2。
 
@@ -74,9 +76,9 @@ Source、FTS5 chunks、Source-bound Claims、冲突确认、Source-native UI、A
 范围：
 
 - 新建全页面工作区；Side Panel 继续只服务当前 SEEK 岗位。
-- 列出已分析岗位，显示岗位身份、推荐、状态、截止日期、更新时间和是否已有材料。
+- 列出已分析岗位，显示岗位身份、Recommendation、截止日期、更新时间、是否已有材料和是否已申请。
 - 重新打开保存的分析、关键证据、下一步和材料；同一岗位重分析保持清楚的历史关系。
-- 让 `Maybe / Preparing / Applied / Skipped / Archived` 成为队列和筛选语义，而不是孤立按钮。
+- Recommendation 继续使用 Agent 的 `APPLY / MAYBE / SKIP`；分析、材料和申请进展从已存在事实得出，只有实际提交需要用户标记 `Applied`，不建立额外人工状态队列。
 - 支持用户补充或修正缺失的截止日期，不把猜测保存为事实。
 - 从当前岗位进入工作区，并从工作区返回原岗位或申请入口。
 
@@ -84,8 +86,8 @@ Source、FTS5 chunks、Source-bound Claims、冲突确认、Source-native UI、A
 
 退出条件：
 
-- 用户能在离开当前 SEEK 页面后找到此前岗位，并回答“现在处于什么状态、为什么、下一步是什么、何时行动”。
-- 同一岗位的分析、材料和状态只有一个清楚归属，重新分析不会产生重复岗位。
+- 用户能在离开当前 SEEK 页面后找到此前岗位，并回答“Agent 怎么建议、已经准备了什么、是否已申请、下一步是什么、何时行动”。
+- 同一岗位的分析、材料和 applied 事实只有一个清楚归属，重新分析不会产生重复岗位。
 - 截止日期缺失时明确显示未知并允许修正；已知日期可用于排序。
 - 至少以三个真实岗位走查列表、详情、状态、重开和材料恢复。
 
@@ -160,7 +162,7 @@ Source、FTS5 chunks、Source-bound Claims、冲突确认、Source-native UI、A
 
 - 真实使用记录、人工材料审核和必要的离线案例评估。
 - 决策正确性、事实一致性、unsupported claim、耗时和费用复盘。
-- 开源 README、安装文档、案例和可选作品展示。
+- 根据最终产品状态更新开源 README、安装文档、案例和 Stage 2 作品集快照。
 - 评估 Chrome Web Store 合规、隐私披露和维护成本后再决定是否发布。
 
 退出条件：
@@ -172,6 +174,6 @@ Source、FTS5 chunks、Source-bound Claims、冲突确认、Source-native UI、A
 ## 持续规则
 
 - 每次改动运行相称的 typecheck、lint、单元或端到端测试。
-- 安全、数据完整性、evidence 校验和用户确认不能延期。
+- 安全、数据完整性、evidence 校验以及材料定稿和最终提交的用户确认不能延期。
 - 当前阶段没有退出前，新想法先记录到对应后续阶段。
 - 不按“AI 两天完成了原两周代码量”跳过产品走查和真实验证。

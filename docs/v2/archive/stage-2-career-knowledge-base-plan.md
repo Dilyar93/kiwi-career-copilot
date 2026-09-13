@@ -4,7 +4,7 @@
 
 ## 1. 用户结果
 
-用户不再先填写一套内部数据表，而是把已有职业资料交给 Kiwi：多份 CV、Visa、证书和项目文档等。Kiwi 自动理解、分类和组织这些来源，只在真实冲突、处理失败或即将产生无来源对外声明时要求确认。
+用户不再先填写一套内部数据表，而是把已有职业资料交给 Kiwi：多份 CV、Visa、证书和项目文档等。Kiwi 自动理解、分类和组织这些来源；Library 只要求用户处理真实冲突或处理失败，岗位分析中的决策关键信息不足时由 Agent 单独提问。
 
 最终用户应能：
 
@@ -13,7 +13,7 @@
 - 让 Agent 先使用结构化事实，必要时搜索片段、打开章节或回到原件。
 - 看见结论和材料中的事实来自哪个文件、页面、章节或代码路径。
 - 保留 Professional、Part-time、Summer 和岗位定制 CV，不被合并覆盖。
-- 默认不审核抽取结果，只处理真正影响任务的冲突和高风险 review items。
+- 默认不审核抽取结果，只处理真实来源冲突和处理失败。
 
 ## 2. 已确认的产品原则
 
@@ -39,7 +39,7 @@
 - 文件之间的缺席、措辞、排序和用途差异不是冲突。
 - 只有同一语义事实在相同时间/范围内不能同时成立，才建立 conflict review item。
 - 低置信信息先保留为未知；只有任务真正需要时才回查或询问。
-- 用户确认形成独立 Resolution，不修改原文件，也不删除历史 Claim。
+- 用户对来源冲突的选择形成独立 Resolution，不修改原文件，也不删除历史 Claim。
 
 ### 完整产品体验与最小实现复杂度并存
 
@@ -61,7 +61,7 @@
 | 用户逐项重建或确认资料 | 默认自动入库，只把真实冲突送入 review inbox |
 | 单层原文行搜索 | Claim → chunk → parent section → original source |
 | 多份 CV 被合并为同一 Profile | 多份 CV 是独立 source/artifact variant |
-| 已确认 Evidence 才可参与分析 | source-backed 可用于有引用的分析；高风险和对外新声明需要确认 |
+| 已确认 Evidence 才可参与分析 | source-backed 可用于有引用的分析；真实来源冲突需要 Resolution，决策关键但证据不足时由 Agent 在当前岗位提问 |
 
 ## 4. 目标信息模型
 
@@ -75,7 +75,7 @@
 - `kind`：CV、Visa、project、certificate、education、portfolio、other。
 - `purpose tags`：professional、part-time、summer、work-rights、project-evidence 等。
 - 敏感等级、语言、时间范围、关联项目/组织。
-- `processing / ready / needs-attention / failed` 状态和可理解的错误。
+- `processing / ready / needs-attention` 状态；理解失败由 `needs-attention` 和可理解的错误共同表达，不另设 `failed` 状态。
 - 原始内容、完整提取文本、解析器和分析版本。
 
 ### Chunk
@@ -107,7 +107,7 @@
 
 ### Resolution
 
-- 用户只对 conflict 或高风险事项作出 Resolution。
+- 用户只对真实来源 conflict 作出 Resolution。
 - Resolution 记录用户选择、涉及的 Claims、适用范围和确认时间。
 - 新来源出现后，如果超出原 Resolution 覆盖的 Claim 集合，重新评估而不是静默沿用。
 
@@ -120,12 +120,12 @@
 
 ### Review Item
 
-只为以下情况产生：
+当前 UI 不维护独立 Review Item 模型，而是把以下两类现有状态汇总进 `Needs your attention`：
 
-- 高影响信息：Visa、工作权利、有效期和关键日期。
-- 同一语义事实在相同范围/时间内存在不可同时成立的来源 Claim。
-- 解析失败、低置信度或无法定位原文。
-- Agent 准备创建一个来源中不存在的新对外声明。
+- 同一语义事实在相同范围/时间内存在不可同时成立的来源 Claim；
+- 来源处理失败，需要重新理解、修正元数据或删除。
+
+单一来源 Claim 不按通用“高风险”规则进入 Library Inbox。低置信信息由 Agent 结合具体岗位决定是否回查或提问；来源中不存在的对外新声明由材料来源校验和用户最终复核处理。
 
 ## 5. 上传与理解流程
 
@@ -139,11 +139,11 @@
 → 按资料用途提取 Source-bound Claims
 → 关联同主题 Claim，并区分补充、版本差异和真实冲突
 → 建立全文检索索引；真实词法召回不足时再增加语义索引
-→ 生成少量 review items
+→ 将处理失败或真实来源冲突汇总进 Needs your attention
 → Source 进入 ready 或 needs-attention
 ```
 
-模型分类或抽取失败不能导致原件消失。重复文件通过内容哈希识别；用户可以保留有意义的版本，也可以取消重复导入。
+模型分类或抽取失败不能导致原件消失。SHA-256 完全相同的文件直接返回已有 Source，不保存重复记录；内容发生变化的有意义版本拥有不同哈希，继续作为独立 Source 共存。
 
 ## 6. Agent 检索与披露流程
 
@@ -205,11 +205,11 @@ Agent 至少需要逐步获得以下能力：
 - 大图标 Source cards：文件名、自动识别用途、标签、敏感等级、处理状态和更新时间。
 - 卡片保持紧凑，只显示文件身份、用途、状态和添加时间；点击或键盘激活后进入文件操作详情。
 - Claims 是内部检索索引，不作为内容清单发送到浏览器或要求用户逐条检查；文件详情只展示概要、元数据和原件/重试/删除等操作。
-- Review inbox 只在存在真实冲突或高风险问题时出现，并直接展示各文件的值和来源。
+- Review inbox 只在存在处理失败来源或真实来源冲突时出现；冲突项直接展示各文件的值和来源。
 - Source、Claims、chunks 和 Resolution 是唯一候选资料路径；未发布的旧 Profile/Evidence 运行层不保留兼容回退。
 - 求职偏好、当前 availability 等可能不属于文件的内容，由 Agent 在任务需要时询问并单独保存。
 
-处理状态必须可见：已接收、解析中、正在理解、可用、需要处理或失败。失败时保留已安全保存的原件，并提供重试、修正类型或删除入口。
+处理状态必须可见：已接收、解析中、正在理解、可用或需要处理。理解失败时保留已安全保存的原件，将 Source 标记为 `needs-attention`，并提供重试、修正类型或删除入口。
 
 ## 9. 实施增量
 
@@ -223,7 +223,7 @@ Agent 至少需要逐步获得以下能力：
 
 完成条件：没有 Profile 也能上传资料；旧文件仍可检索；分类失败不丢原件。
 
-### B. Source-bound Claims（代码纵切已完成，待真实资料校准）
+### B. Source-bound Claims（代码纵切与首轮真实资料走查已完成）
 
 - 每次理解资料时提取绑定 Source、语义 key 和原文定位的完整记录型 Claims。
 - 模型按文件自己的类别、结构和内容生成动态 attributes；教育、工作、项目等记录不能被拆成孤立日期、机构或职位字段。
@@ -233,9 +233,9 @@ Agent 至少需要逐步获得以下能力：
 
 完成条件：导入两份资料后，每条理解结果都可回到各自文件；真实冲突可确认，普通内容差异不要求审核。
 
-当前实现：模型输出 `title + 完整 statement + 动态 attributes` 的来源记录；服务端只保存能在提取原文中重新定位的 Claim；SQLite schema v7 保存 Claim 和独立 Resolution，并只在相同排他语义 key 的共同属性出现不同值时识别冲突，字段缺席不构成冲突。旧 Profile/Evidence 与过期 Agent runs 已迁移删除，Source 原件、chunks 和有效 Claims 保留；高敏感来源不索引 identity/contact。时间、用途和适用范围的深层语义判定留给真实资料校准。
+当前实现：模型输出 `title + 完整 statement + 动态 attributes` 的来源记录；服务端只保存能在提取原文中重新定位的 Claim；SQLite schema v8 保存 Claim 和独立 Resolution，并只在相同排他语义 key 的共同属性出现不同值时识别冲突，字段缺席不构成冲突。旧 Profile/Evidence 与过期 Agent runs 已迁移删除，Source 原件、chunks 和有效 Claims 保留；高敏感来源不索引 identity/contact。时间、用途和适用范围的深层语义判定继续随真实使用校准，不再阻塞 Stage 2。
 
-### C. Source-native 资料库 UI（代码纵切已完成，待真实资料走查）
+### C. Source-native 资料库 UI（代码纵切与真实资料走查已完成）
 
 - 移除 `Facts / Experience` 并列主导航，默认只有添加资料、Source cards 和按需出现的 Review Inbox。
 - 卡片不展开长内容；点击后进入文件概要和操作详情。
@@ -280,7 +280,7 @@ Agent 至少需要逐步获得以下能力：
 - 不运行命令、不先建 Profile，也能添加、理解、查看和删除职业资料，并完成岗位分析。
 - 至少两份不同用途 CV、一份 Visa/证书类文档和一个项目 README/Markdown 完成真实走查。
 - 原件、chunk、Source Claim、Resolution 和分析结论之间可以回溯。
-- 用户无需逐字段重新录入或确认已有 CV；只处理真实冲突和高价值 review items。
+- 用户无需逐字段重新录入或确认已有 CV；只处理真实冲突和处理失败来源。
 - Agent 在事实不足时能逐层检索，在无结果或冲突时询问用户。
 - 多份 CV Source 独立存在，缺席不会被误判为能力缺失；基础 CV 与岗位 variant 的编辑关系由 Stage 4 建立。
 - 解析、模型或索引失败不会覆盖既有资料或丢失已上传原件。

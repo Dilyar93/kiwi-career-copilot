@@ -16,13 +16,13 @@
 
 - 正常情况下返回完整、带来源的判断。
 - 信息不足时返回明确的 unknown 和可回答问题，而不是为了追求确定性无限检索。
-- 接近运行边界时停止扩张上下文，使用已取得的 observation 生成暂定但可用的结果。
+- 接近运行边界时停止扩张上下文，使用已取得的 observation 生成完整结构化结果，并明确保留 unknown。
 - 网络、Provider 或进程中断后保留已完成检查，后续可以恢复，不必从零重复消费。
 - 只有无法形成任何安全结论时才显示失败；失败信息和本地日志必须能说明停在哪一层。
 
-## 2. 当前问题
+## 2. 问题背景与已完成处理
 
-当前 PydanticAI tool loop 会把此前模型请求和完整工具返回持续带入后续请求。Claims、chunks 和 Profile 结果即使已经被模型理解，仍会在每一轮重复占用上下文；累计 token 因此同时计算多次相同内容。此前的 80k 累计 token 上限又在 Provider 返回并计费后检查，导致已付费结果被丢弃。
+改造前的 PydanticAI tool loop 会把此前模型请求和完整工具返回持续带入后续请求。Claims、chunks 等结果即使已经被模型理解，仍会在每一轮重复占用上下文；当时的 80k 累计 token 上限又在 Provider 返回并计费后检查，可能导致已付费结果被丢弃。
 
 紧急修复先移除了累计 token/output、产品总超时和浏览器中止。增量 A–D 随后补上运行期 observation/requirement ledger、完全相同调用去重、按上下文窗口压缩、接近最终保险丝前的 finalization、失败 checkpoint/继续和带 cursor 的自适应检索分页。不同 query 即使暂时零命中也仍是 Agent 主动取得的新 observation，不会被系统当成无进展；只有完全重复调用才进入循环收敛。真实 Qwen 使用已完成失败 checkpoint、进程重启和同一 run 恢复，并暴露、修复了工具数组被编码成字符串及已打开 Source 使用基础 ID 引用导致最终结果被丢弃的问题。当前剩余工作是不建设独立评测平台，继续从日常分析观察重复读取、上下文和费用。
 
@@ -36,7 +36,7 @@ Agent 决定检查哪些要求、选择什么工具、如何修改检索表达�
 
 - 能在请求前判断的边界必须在请求前处理，不能等待已计费响应后再丢弃。
 - 软边界触发 context compaction、禁止无效重复和 finalization。
-- 最后熔断仍用于防无限循环，但触发后优先用现有 observation 形成 `provisional` 结果。
+- 最后熔断仍用于防无限循环，但触发前优先用现有 observation 形成合法的 completed 结果，并明确其中的 unknown。
 - 不用一个 token 数同时承担成本、上下文质量和循环检测三种职责。
 
 ### 事实状态独立于聊天记录
@@ -47,7 +47,7 @@ Agent 决定检查哪些要求、选择什么工具、如何修改检索表达�
 
 - 当前工具返回完整保留一轮，让模型读取新 observation。
 - 已进入 Ledger 的旧工具结果在下一轮替换为短引用；动态 runtime instruction 提供去重后的当前 Ledger。
-- 优先使用模型 profile 暴露的 context-window 占用比例触发压缩；模型没有窗口元数据时才使用保守的本地字符估算。
+- 只在框架提供 context-window 占用比例，或当前 Qwen 的已知窗口和 token usage 足以计算时触发压力压缩；没有可信窗口信息时不猜测。
 - 检索结果逐步演进为按 requirement 的 cursor/coverage；单轮上下文预算不限制本地候选总量。
 
 ### 可恢复而不是重跑
@@ -67,12 +67,11 @@ observing ↔ tool call → update ledger/checkpoint
 context pressure / no progress / enough evidence
    ↓
 finalizing（停止扩张检索，只基于 Ledger 生成结果）
-   ├─ completed
-   ├─ provisional（有未知项但可用）
+   ├─ completed（可包含明确 unknown 和 clarification）
    └─ failed（没有任何安全结果，保留 checkpoint）
 ```
 
-`provisional` 不是低质量成功伪装：它必须说明哪些要求已核验、哪些仍未知、使用了哪些来源，以及用户可以回答什么或如何继续。
+当前 API 不设置独立的 `provisional` 状态。只要能形成安全结论，就返回 `completed` Recommendation，并在其中说明哪些要求已核验、哪些仍未知、使用了哪些来源，以及用户可以回答什么或如何继续。
 
 ## 5. 实施增量
 
@@ -94,14 +93,14 @@ finalizing（停止扩张检索，只基于 Ledger 生成结果）
 - finalizer 必须允许输出 informational unknown；是否产生 clarification 由同一 Agent 按其答案能否改变推荐或下一步判断，系统不为 unknown 自动撰写问题。不得为了返回结果放松 evidence、work-right 和 hard-blocker 材料安全规则。
 - 若主 loop 已经产生合法最终结果，永远优先返回该结果。
 
-完成条件：构造一个持续重复工具的测试场景时，API 返回 completed/provisional recommendation，而不是 `AGENT_STEP_LIMIT`。
+完成条件：构造一个持续重复工具的测试场景时，API 返回带明确 unknown 的 completed recommendation，而不是 `AGENT_STEP_LIMIT`。
 
 ### C. Checkpoint 与恢复
 
 - analysis ID 在运行开始前生成；岗位 snapshot 和 processing run 先写入 SQLite。
 - 每次 ToolEvent 后更新同一 run checkpoint，完成时原子写入最终 response。
 - 失败 run 保留错误类别、最后安全阶段和可恢复状态，不保存 API Key、私人完整 prompt 或隐藏推理。
-- Job 页面为可恢复 run 提供“继续分析”，恢复时复用 Ledger，不能重新执行相同工具调用。
+- 用户在当前岗位页重新发起分析时，服务端对相同 fingerprint 的失败 run 透明恢复并复用 Ledger；UI 不另设 checkpoint 专用状态或按钮。
 - clarification continuation 继承上一轮已验证 observation；只有 Candidate fingerprint 未变化时才复用，资料改变后不得沿用旧来源。
 
 完成条件：在至少一次工具返回后主动中断服务，重启后能从 checkpoint 继续并得到结果。

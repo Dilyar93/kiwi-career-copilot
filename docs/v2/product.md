@@ -4,7 +4,7 @@
 
 让个人求职从“散落的岗位、简历文件、Cover Letter、申请记录和改进建议”变成一个连续、可信、可执行的本地工作空间。
 
-产品不是简单给 JD 打分，也不是自动海投工具。它应持续理解用户已经确认的背景和 evidence，在不同岗位中采取不同动作，并把每次申请产生的信息积累回个人求职系统。
+产品不是简单给 JD 打分，也不是自动海投工具。它应持续理解用户提供的背景和 evidence，在不同岗位中采取不同动作，并把每次申请产生的信息积累回个人求职系统。
 
 ## 2. 当前目标用户
 
@@ -49,7 +49,8 @@ CV、项目经历、签证、课表、技能、GitHub 和申请历史分散在�
 ### Evidence-grounded
 
 - 原始来源是最终可回查依据，结构化 Claim 是带精确引用的派生查询层。
-- source-backed 事实可以用于有引用的分析；高风险事实、来源冲突和来源中不存在的对外新声明必须由用户确认。
+- source-backed 事实可以用于有引用的分析；来源冲突必须由用户选择或标记为 contextual，来源中不存在的对外新声明必须由用户确认。
+- 当前不对单一来源 Claim 建立通用“高风险”分级或 Library 确认状态；决策关键但证据不足的信息由 Agent 在当前岗位中提问，回答只属于该次 continuation。
 - 缺少证据时输出 unknown 或 gap；检索不到不能推断用户不具备某项能力。
 - Agent 提议的改写必须可追溯、可比较、可拒绝。
 
@@ -58,7 +59,7 @@ CV、项目经历、签证、课表、技能、GitHub 和申请历史分散在�
 - 私人资料、历史和材料默认留在本机。
 - 本地保存完整原件；上传理解会在明确披露后把提取文本发送给模型 Provider，后续岗位任务先发送最小事实或片段，必要时由 Agent 逐层深入读取。
 - 用户可以查看、修改、导出和删除数据。
-- 敏感声明、材料定稿、表单填写和最终提交必须由用户确认。
+- 来源中不存在的对外新声明、材料定稿、表单填写和最终提交必须由用户确认。
 
 ### 渐进扩展
 
@@ -75,7 +76,7 @@ CV、项目经历、签证、课表、技能、GitHub 和申请历史分散在�
 理解产品与隐私边界
 → 检查本地服务和模型配置
 → 添加已有 CV、项目或其他职业资料
-→ Kiwi 自动理解并只要求处理冲突、高风险或低置信度内容
+→ Kiwi 自动理解，只要求处理失败来源或真实来源冲突
 → 在 SEEK 打开第一个岗位
 ```
 
@@ -88,7 +89,7 @@ CV、项目经历、签证、课表、技能、GitHub 和申请历史分散在�
 → 打开当前岗位
 → Agent 读取岗位与必要的个人上下文
 → Agent 按需检索 Claims、原文片段、指定原件、申请历史或外部来源
-→ 给出申请、待确认、稍后或跳过建议
+→ 给出 `APPLY`、`MAYBE` 或 `SKIP` 建议，并单独列出仍待确认的信息
 → 解释关键依据和下一步
 ```
 
@@ -121,17 +122,17 @@ CV、项目经历、签证、课表、技能、GitHub 和申请历史分散在�
 
 ## 6. 产品能力地图
 
-| 能力域 | 目标能力 | 当前成熟度 |
-|---|---|---|
-| SEEK 浏览增强 | 负向规则、状态和距离筛选 | 可用的 V1 能力 |
-| Career Knowledge Base | Sources、Chunks、Claims、Review items 和来源下钻 | Source-only 纵切已实现并经过两份 CV、Visa 与课表真实走查；项目 Markdown 待最后 smoke test |
-| Job workspace | 提取、分析、截止日期、行动建议和长期回看 | 当前岗位分析已可用；全页面岗位工作区是下一阶段 |
-| Material workspace | Master CV、variants、差异编辑、Cover Letter、导出 | Source-first 生成、snapshot 和全页面预览原型 |
-| Application tracking | 状态、历史、材料和岗位关联 | SQLite/API 基础已实现，尚无用户工作区 |
-| Career intelligence | 高频要求、gap、学习/GitHub/LinkedIn backlog | 未实现 |
-| Shareable local product | onboarding、安装、配置、迁移、恢复 | 未实现 |
+| 能力域 | 产品目标 |
+|---|---|
+| SEEK 浏览增强 | 负向规则、状态和距离筛选 |
+| Career Knowledge Base | Sources、Chunks、Claims、冲突 Resolution 和来源下钻 |
+| Job workspace | 提取、分析、截止日期、行动建议和长期回看 |
+| Material workspace | Master CV、variants、差异编辑、Cover Letter 和导出 |
+| Application tracking | 状态、历史、材料和岗位关联 |
+| Career intelligence | 高频要求、gap、学习/GitHub/LinkedIn backlog |
+| Shareable local product | onboarding、安装、配置、迁移和恢复 |
 
-详细事实以 [当前状态](current-state.md) 为准。
+实际成熟度以 [当前状态](current-state.md) 为准，实施顺序和阶段边界以 [路线图](roadmap.md) 为准。
 
 ## 7. 主要产品界面目标
 
@@ -146,15 +147,13 @@ CV、项目经历、签证、课表、技能、GitHub 和申请历史分散在�
 
 这只是产品层级要求，不是已确认的 UI 稿。正式重设计时应基于当前 Side Panel 尺寸、真实任务和用户走查另写 UI 方案。
 
-## 8. 当前不做
+## 8. 产品边界
 
 - 自动提交申请或无人值守海投。
 - 未经确认自动填写敏感、法律或医疗声明。
-- 修复 Trade Me。
-- 同时建设多个模型 Provider、GraphRAG、多 Agent 或分布式任务系统。
-- FlowCV 式自由画布、多主题市场或完整排版引擎；阶段 4 仍会实现结构化编辑、实时预览、章节排序与显隐、多份基础 CV 和岗位版本。
-- 在产品主流程完成前扩建 evaluation 平台和展示包装。
-- 当前阶段投入 Chrome Web Store 合规与重新发布；但安全和隐私要求持续有效。
+- 通用自由画布、多主题市场或完整排版引擎；材料工作区只服务结构化职业资料、岗位版本、复核和导出。
+
+阶段性不做事项、技术延后项和发布安排只记录在 [路线图](roadmap.md) 与 [设计演变](decisions.md)，不写入稳定产品定义。
 
 ## 9. 产品成功定义
 

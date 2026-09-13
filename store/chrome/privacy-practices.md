@@ -1,7 +1,9 @@
 # Chrome Web Store privacy-practices answers
 
-Use these answers in the Developer Dashboard and keep them consistent with the
-deployed `site/privacy.html`.
+These answers document the Developer Dashboard disclosure for the published V1
+`0.8.0` extension and remain consistent with the deployed
+[privacy notice](https://dilyar93.github.io/kiwi-job-search-enhancer-site/privacy.html).
+They apply only to V1 and must not be used for an unreleased V2 submission.
 
 ## Single purpose
 
@@ -52,6 +54,7 @@ contains the Chrome Web Store Limited Use statement.
 
 ## Publisher fields
 
-Before submission, set the Developer Dashboard contact email to a monitored
-address and deploy `site/` to HTTPS. Enter the resulting privacy and support URLs
-in the listing; do not enter a local file path.
+For maintenance of the published V1 listing, keep the Developer Dashboard
+contact email monitored and its privacy and support URLs pointed to the deployed
+[V1 public site](https://dilyar93.github.io/kiwi-job-search-enhancer-site/).
+These fields are not a V2 submission checklist.

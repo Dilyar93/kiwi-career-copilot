@@ -1,6 +1,6 @@
 # Stage 3 实施计划：Jobs/Application Workspace
 
-状态：下一开发阶段。Stage 2 完成项目文档 smoke test 后开始实施。
+状态：当前下一开发阶段。Stage 2 已完成并关闭。
 
 ## 1. 用户结果
 
@@ -9,7 +9,7 @@
 完成后，用户应能：
 
 - 离开 SEEK 后仍找到此前分析过的岗位。
-- 按状态和截止日期找到需要优先处理的岗位。
+- 按 Recommendation、截止日期、材料和已申请事实找到需要继续处理的岗位。
 - 打开岗位详情，查看最新建议、关键依据、下一步和已有材料。
 - 从同一岗位回到 SEEK/申请入口，或继续准备和查看材料。
 - 重新分析同一岗位而不生成第二个重复岗位。
@@ -22,7 +22,7 @@ Side Panel 继续是当前网页 companion，只处理：
 
 - 当前 SEEK 岗位同步与分析。
 - Agent 追问和当前最重要动作。
-- 快速保存状态、准备材料或打开完整工作区。
+- 准备材料或打开完整工作区；材料生成后可标记已申请。
 
 ### Full-page Workspace
 
@@ -41,6 +41,7 @@ Stage 3 不提前显示空的 CV、Career 或 Analytics 导航。Stage 4 在同�
 - `jobs` 已保存完整 `JobPosting` snapshot。
 - `agent_runs` 已保存分析、工具摘要、usage、checkpoint 和最终 response。
 - `applications` 已按稳定 job identity 聚合 analysis IDs、状态和材料 snapshots。
+- 当前 Python/TypeScript `ApplicationStatus` union 仍接受未被 UI 写入的 `maybe / skipped / archived`；这是待协调清理的类型余量，不是 Stage 3 产品需求。
 - 已有 `GET /v1/applications`、`PATCH /v1/applications/{id}`、`GET /v1/analyses/{id}` 和材料读取 API。
 - Side Panel 已能建立稳定岗位 identity、缓存当前结果并打开全页面材料。
 
@@ -55,20 +56,17 @@ Stage 3 应扩展这些边界，不创建第二套岗位数据库、浏览器端
 - job identity、标题、公司、地点、canonical/application URL。
 - employment type、posted/closes date 及原始文本。
 - 最新 recommendation、fit、readiness 和一句关键原因。
-- 当前状态、最新 analysis ID、analysis 数量、material 是否存在和更新时间。
+- 是否已有材料、是否已申请、最新 analysis ID、analysis 数量和更新时间。
 
 优先从现有 `jobs + applications + agent_runs` 组合读取；没有证明查询量或迁移需求前，不复制成新表。
 
-### 状态语义
+### Recommendation 与进展事实
 
-- `Analysed`：系统已完成分析，尚无用户承诺。
-- `Maybe`：用户希望稍后比较或补充信息，是可操作队列。
-- `Preparing`：已经生成材料，系统自动进入。
-- `Applied`：用户确认已提交，用于回看和后续结果。
-- `Skipped`：用户明确不申请，但保留判断记录。
-- `Archived`：从活跃列表隐藏，不等于删除。
-
-状态必须影响列表分组、筛选或下一步；不再把无用途的状态按钮平铺在当前岗位页。
+- `APPLY / MAYBE / SKIP` 是 Agent 对岗位的 Recommendation，直接随最新分析展示，不复制成第二套用户状态。
+- 是否已分析由 analysis 是否存在得出。
+- 是否正在准备或已有材料由 material snapshot 是否存在得出，不要求用户手动标记。
+- `Applied` 是系统无法从本地数据自动知道的外部事实，只有用户实际提交后才显式确认。
+- 不建立 `Maybe / Skipped / Archived` 人工队列状态。只有真实岗位数量造成列表整理问题后，才重新评估归档能力。
 
 ### 截止日期
 
@@ -84,14 +82,14 @@ SEEK 已提取的日期直接显示并保留来源。缺失时显示 `Unknown`�
 
 ### Jobs list
 
-- 默认显示活跃岗位，按截止日期紧迫度和更新时间排序。
-- 支持最小必要的状态筛选和文本搜索。
-- 每行只显示岗位身份、状态、推荐、截止日期、更新时间和材料标记。
+- 默认显示已分析岗位，按截止日期紧迫度和更新时间排序。
+- 首版不要求人工状态筛选；岗位数量证明需要后，可按 Recommendation、是否有材料、是否已申请或文本筛选。
+- 每行只显示岗位身份、Recommendation、截止日期、更新时间、材料和已申请标记。
 - 空状态解释如何从 SEEK 分析第一个岗位。
 
 ### Job detail
 
-- 首屏先显示岗位、状态、推荐和下一步。
+- 首屏先显示岗位、Recommendation、材料/申请进展和下一步。
 - 展开查看 blockers、matches、gaps、unknowns 和来源。
 - 显示最新材料并打开材料页；没有材料时按 analysis action 提供准备入口。
 - 提供原岗位和申请入口。
@@ -126,10 +124,10 @@ SEEK 已提取的日期直接显示并保留来源。缺失时显示 `Unknown`�
 ### C. Job detail 与行动
 
 - 展示最新分析、状态、截止日期、来源摘要、材料和外部链接。
-- 支持 Maybe、Applied、Skipped、Archived 和截止日期修正。
+- 支持打开原岗位、重新分析、准备/打开材料、标记已申请和修正截止日期；不要求维护额外人工状态。
 - 支持打开既有材料；需要重新分析时引导回岗位，不伪造离线最新 JD。
 
-完成条件：用户可以从一个页面理解并推进岗位，不需要回忆每个状态按钮的意义。
+完成条件：用户可以从一个页面理解并推进岗位，不需要额外维护一套人工状态。
 
 ### D. 恢复与产品走查
 
@@ -142,8 +140,8 @@ SEEK 已提取的日期直接显示并保留来源。缺失时显示 `Unknown`�
 ## 8. Stage 3 退出条件
 
 - 用户离开 SEEK 后仍能找到、理解并继续此前岗位。
-- 同一岗位的多个分析、材料和状态归属清楚，不产生重复岗位。
-- 状态能驱动真实队列和筛选，不是孤立元数据。
+- 同一岗位的多个分析、材料和 applied 事实归属清楚，不产生重复岗位。
+- 用户能依据 Recommendation、截止日期、材料和已申请事实找到需要继续处理的岗位。
 - 已知/未知截止日期表达清楚，用户修正可持久化。
 - 全页面工作区刷新、扩展重载和本地服务重启后均可恢复。
 - Side Panel 保持当前岗位 companion，没有被长期列表和编辑器重新塞满。

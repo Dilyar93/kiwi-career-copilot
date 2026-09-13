@@ -10,6 +10,7 @@ coverage
 playwright-report
 test-results
 agent-data
+private-notes/
 *.log
 web-ext.config.ts
 .DS_Store

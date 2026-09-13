@@ -1,5 +1,7 @@
 # Technical Deep Dive
 
+> Stage 2 portfolio snapshot. This document is frozen for internship and interview use; current development facts live in [V2 current state](../v2/current-state.md).
+
 This document explains the implemented Agent and Career Library slice of Kiwi Career Copilot. Planned capabilities are deliberately excluded or identified as future work.
 
 ## 1. System boundary
@@ -141,7 +143,7 @@ The agent returns a strict Pydantic `Recommendation` containing:
 - CV and cover-letter actions;
 - next actions and a termination reason.
 
-Every candidate finding must carry a source reference obtained through a retrieval tool or a job-local clarification reference. The output validator compares references with those actually retrieved during the run.
+Every finding must carry at least one source-reference identifier. For candidate-library references using the `source.*` or `document.*` namespaces, the output validator compares them with references actually retrieved during the run. Other identifiers, including job-local references such as `job.description` and `clarification.N`, are currently passed through rather than checked against the retrieval ledger; the service therefore does not claim that every finding reference is verified.
 
 Real models sometimes shorten an opened reference from `source.id.original` to its base source ID. The validator normalises that alias only when the exact original was genuinely retrieved. Invented `source.*` or `document.*` references still trigger a model retry.
 

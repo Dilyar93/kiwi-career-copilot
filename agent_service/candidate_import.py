@@ -33,7 +33,7 @@ def _normalise_text(value: str) -> str:
     if len(text) < 30:
         raise CandidateDocumentError("no-text")
     if len(text) > MAX_DOCUMENT_TEXT:
-        raise CandidateDocumentError("too-large")
+        raise CandidateDocumentError("limit-exceeded")
     return text
 
 
@@ -42,7 +42,7 @@ def _read_docx(content: bytes) -> str:
         with ZipFile(BytesIO(content)) as archive:
             document = archive.getinfo("word/document.xml")
             if document.file_size > MAX_DOCUMENT_TEXT * 4:
-                raise CandidateDocumentError("too-large")
+                raise CandidateDocumentError("limit-exceeded")
             root = ElementTree.fromstring(archive.read(document))
     except (BadZipFile, KeyError, ElementTree.ParseError) as error:
         raise CandidateDocumentError("unreadable") from error
@@ -60,8 +60,10 @@ def _read_docx(content: bytes) -> str:
 def _read_pdf(content: bytes) -> tuple[str, list[str]]:
     try:
         reader = PdfReader(BytesIO(content))
-        if reader.is_encrypted or len(reader.pages) > MAX_PDF_PAGES:
+        if reader.is_encrypted:
             raise CandidateDocumentError("unreadable")
+        if len(reader.pages) > MAX_PDF_PAGES:
+            raise CandidateDocumentError("limit-exceeded")
         pages = [page.extract_text() or "" for page in reader.pages]
     except (PdfReadError, ValueError, OSError) as error:
         if isinstance(error, CandidateDocumentError):
@@ -89,7 +91,7 @@ def extract_candidate_document(
     except (Base64Error, ValueError) as error:
         raise CandidateDocumentError("unreadable") from error
     if len(content) > MAX_DOCUMENT_BYTES:
-        raise CandidateDocumentError("too-large")
+        raise CandidateDocumentError("limit-exceeded")
 
     warnings: list[str] = []
     if suffix in {".txt", ".md"}:

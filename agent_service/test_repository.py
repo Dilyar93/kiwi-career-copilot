@@ -1,7 +1,12 @@
+import json
 import sqlite3
 from pathlib import Path
 
-from .models import CandidateSourceClaimInput, CandidateSourceClassification
+from .models import (
+    CandidateSourceClaimInput,
+    CandidateSourceClassification,
+    CandidateSourceMetadataUpdate,
+)
 from .repository import (
     create_candidate_source,
     load_candidate_claims,
@@ -12,6 +17,7 @@ from .repository import (
     save_candidate_source_claims,
     search_candidate_sources,
     update_candidate_source,
+    update_candidate_source_metadata,
 )
 
 
@@ -62,7 +68,7 @@ def test_old_profile_tables_are_removed_while_sources_survive(tmp_path: Path) ->
             "SELECT name FROM sqlite_master WHERE type = 'table'",
         ).fetchall()
     }
-    assert migrated.execute("PRAGMA user_version").fetchone()[0] == 7
+    assert migrated.execute("PRAGMA user_version").fetchone()[0] == 8
     assert "candidate_profile" not in tables and "evidence" not in tables
     assert "candidate_sources" in tables and "source_claims" in tables
 
@@ -135,3 +141,71 @@ def test_sensitive_sources_never_index_identity_or_contact_claims(tmp_path: Path
 
     assert [item.category for item in saved] == ["work-rights"]
     assert load_candidate_claims(connection, source.id)[0].source_ref.startswith(source.id)
+
+
+def test_marking_an_existing_source_sensitive_removes_private_claims(tmp_path: Path) -> None:
+    connection = open_database(tmp_path / "sensitivity-update.sqlite3")
+    text = "Aroha Example. Visa permits twenty hours of work each week."
+    source = ready_source(connection, "cv.txt", text)
+    save_candidate_source_claims(connection, source.id, text, [
+        claim(
+            category="identity", key="identity.name", title="Name",
+            statement="The candidate is Aroha Example.", attributes={"name": "Aroha Example"},
+            sourceText="Aroha Example", exclusive=True,
+        ),
+        claim(
+            category="work-rights", key="work-rights.weekly-hours", title="Work condition",
+            statement="The visa permits twenty hours of work each week.",
+            attributes={"maximum-hours": "twenty"},
+            sourceText="Visa permits twenty hours of work each week", exclusive=True,
+        ),
+    ])
+
+    updated = update_candidate_source_metadata(connection, source.id, CandidateSourceMetadataUpdate(
+        kind="visa", purposeTags=["work-rights"], sensitivity="highly-sensitive",
+    ))
+
+    assert updated and updated.sensitivity == "highly-sensitive"
+    assert [item.category for item in load_candidate_claims(connection, source.id)] == [
+        "work-rights",
+    ]
+    assert connection.execute(
+        "SELECT category FROM source_claims WHERE source_id = ?", (source.id,),
+    ).fetchall()[0]["category"] == "work-rights"
+
+
+def test_v7_sensitive_claims_are_hidden_then_removed_on_upgrade(tmp_path: Path) -> None:
+    path = tmp_path / "sensitivity-migration.sqlite3"
+    connection = open_database(path)
+    text = "Client number AB123."
+    source = ready_source(connection, "identity.txt", text)
+    private_claim = save_candidate_source_claims(connection, source.id, text, [
+        claim(
+            category="identity", key="identity.client-number", title="Client number",
+            statement="The client number is AB123.", attributes={"number": "AB123"},
+            sourceText="Client number AB123", exclusive=True,
+        ),
+    ])[0]
+    with connection:
+        connection.execute(
+            "UPDATE candidate_sources SET sensitivity = 'highly-sensitive' WHERE id = ?",
+            (source.id,),
+        )
+        connection.execute(
+            """INSERT INTO claim_resolutions(
+            conflict_id, claim_key, claim_ids_json, selected_claim_id, resolved_at
+            ) VALUES (?, ?, ?, ?, ?)""",
+            (
+                "conflict.stale", private_claim.key, json.dumps([private_claim.id]),
+                private_claim.id, "2026-09-13T00:00:00+00:00",
+            ),
+        )
+        connection.execute("PRAGMA user_version = 7")
+
+    assert load_candidate_claims(connection, source.id) == []
+    connection.close()
+
+    migrated = open_database(path)
+    assert migrated.execute("PRAGMA user_version").fetchone()[0] == 8
+    assert migrated.execute("SELECT COUNT(*) FROM source_claims").fetchone()[0] == 0
+    assert migrated.execute("SELECT COUNT(*) FROM claim_resolutions").fetchone()[0] == 0

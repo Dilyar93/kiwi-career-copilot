@@ -45,8 +45,8 @@ local-first filtering and job-status tools.
 7. Geolocation is optional to the workflow and is only invoked by selecting
    “Use my current location”.
 
-## URLs to enter after deploying `site/`
+## Published V1 URLs
 
-- Homepage: `/index.html`
-- Privacy policy: `/privacy.html`
-- Support: `/support.html`
+- Homepage: `https://dilyar93.github.io/kiwi-job-search-enhancer-site/`
+- Privacy policy: `https://dilyar93.github.io/kiwi-job-search-enhancer-site/privacy.html`
+- Support: `https://dilyar93.github.io/kiwi-job-search-enhancer-site/support.html`

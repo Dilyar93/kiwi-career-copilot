@@ -36,7 +36,7 @@ Agent 是岗位分析的唯一语义决策者：它看到岗位和安全的 Libr
 - 在模型追问后再由系统拼接“unknown 问题”。
 - 因某个测试案例而硬编码推荐、问题或事实解释。
 
-可靠性 finalization 只会在重复无新信息或真实上下文压力时暂时收起工具，让同一个 Agent 用现有 observation 安全结束；它不能修改 recommendation、制造问题或把 unknown 改成 gap。输出 validator 只校验结构一致性与来源引用。
+可靠性 finalization 只会在重复无新信息或真实上下文压力时暂时收起工具，让同一个 Agent 用现有 observation 安全结束；它不能修改 recommendation、制造问题或把 unknown 改成 gap。输出 validator 只校验 hard blocker 与材料动作的安全一致性、clarification questions 去重，以及候选资料 `source.*` / `document.*` 引用是否来自运行期检索；`termination_reason` 不作为工作流状态源。
 
 ## 3. Candidate Knowledge
 
@@ -55,7 +55,7 @@ CandidateSource 原件
 
 ### Source
 
-PDF、DOCX、TXT 和 Markdown 原件先保存在本地 SQLite。确定性解析产生全文与 chunks；受约束模型根据文件自身类别、结构和内容产生 classification、summary 和完整逻辑记录型 Claims。抽取失败保留原件并标记 `needs-attention`。
+PDF、DOCX、TXT 和 Markdown 先经过大小、格式和确定性解析校验；校验或解析失败的输入不会入库。解析成功后，原件、全文与 chunks 先保存在本地 SQLite，再由受约束模型根据文件自身类别、结构和内容产生 classification、summary 和完整逻辑记录型 Claims。后续模型理解失败时保留已入库原件并标记 `needs-attention`。
 
 Claim 是检索索引，不是全局事实：每条绑定一个 Source、完整 statement、动态 attributes 和能在抽取文本中重新定位的 verbatim sourceText。教育、工作或项目的机构/角色/日期属于同一逻辑记录，不能拆成孤立字段。
 
@@ -75,7 +75,7 @@ Claims/chunks 的分页只适配模型剩余上下文，不限制本地总召回
 ## 4. 敏感资料边界
 
 - 原始文件和索引保存在本机；上传理解会把提取文本发送给用户配置的模型 Provider，UI 必须明确说明。
-- 高敏感 Source 不建立 identity/contact、证件号、客户号、出生信息或国籍 Claims；只索引与任务有关的权利、限制、条件和有效期。
+- 高敏感 Source 的导入 contract 要求模型不建立 identity/contact、证件号、客户号、出生信息或国籍 Claims，并只提取与任务有关的权利、限制、条件和有效期。服务端在初次保存、敏感度变更、数据库迁移和统一读取边界确定性排除 identity/contact categories；其余更宽的语义范围依赖模型遵守导入 contract。
 - 通用 chunk search 不返回高敏感来源；Agent 可以从 catalogue 选择确切 source ID 搜索或打开原文。该选择不会触发系统业务拒绝。
 - UI、持久化 ToolEvent 和日志只保存安全摘要，不保存模型隐藏思维或打开的敏感全文。
 - 模型读取能力不等于发布权限；对外材料仍受来源引用和用户最终确认约束。
@@ -106,7 +106,7 @@ completed Analysis
 
 当前运行入口是 SEEK-only。`JobPosting` 隔离网站 DOM 与 Agent/存储/材料，领域层不得引用 SEEK selector。Trade Me 已退役。
 
-阶段 3 可增加“读取用户当前打开的公司招聘详情页”，但不建立通用站点插件系统：generic reader 输出可验证预览，经用户确认后进入同一 `JobPosting` 边界。
+阶段 5 的 Job Enrichment 可增加“读取用户当前打开的公司招聘详情页”，但不建立通用站点插件系统：generic reader 输出可验证预览，经用户确认后进入同一 `JobPosting` 边界。
 
 当前 API：
 
@@ -129,7 +129,7 @@ Analysis POST 支持 NDJSON 安全活动事件；这些是已完成工具动作�
 
 ## 8. 存储与演进
 
-SQLite schema v7 包含 `candidate_sources`、`source_chunks`/FTS5、`source_claims`、`claim_resolutions`、`jobs`、`agent_runs` 和 `applications`。从 v1–v6 打开数据库时删除未发布的 Profile/Evidence 表与旧 prompt runs，保留 Source 原件/chunks/Claims；同时清理高敏感来源中旧 identity/contact Claims。
+SQLite schema v8 包含 `candidate_sources`、`source_chunks`/FTS5、`source_claims`、`claim_resolutions`、`jobs`、`agent_runs` 和 `applications`。从 v1–v7 打开数据库时删除适用版本中未发布的 Profile/Evidence 表与旧 prompt runs，保留 Source 原件/chunks/Claims；同时清理高敏感来源中旧 identity/contact Claims 及其 conflict resolutions。
 
 数据库、API key、个人原件和生成材料不进入 Git。服务只绑定 `127.0.0.1`，要求共享 token 和精确 extension identity/origin，请求经过大小和严格 schema 校验。
 

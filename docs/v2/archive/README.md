@@ -9,5 +9,7 @@
 - [初版 evaluation 计划](initial-evaluation-plan.md)
 - [V2 开始前基线](baseline-2026-09-04.md)
 - [技术纵切进度快照](progress-2026-09-06.md)
+- [Stage 2 Career Knowledge Base 已完成计划](stage-2-career-knowledge-base-plan.md)
+- [Agent Runtime 可靠性已完成计划](agent-runtime-reliability-plan.md)
 
 当前决策见 [设计演变](../decisions.md)，当前真实实现见 [当前状态](../current-state.md)。

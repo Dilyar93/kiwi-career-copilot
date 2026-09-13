@@ -9,6 +9,7 @@ from pydantic_ai import ModelMessage, ModelRequest, ModelResponse, ToolCallPart,
 from pydantic_ai.models.function import AgentInfo, FunctionModel
 
 from .app import create_app
+from .candidate_import import MAX_DOCUMENT_TEXT
 from .config import Settings
 from .models import Recommendation
 
@@ -136,6 +137,16 @@ async def test_health_security_and_empty_library(api: httpx2.AsyncClient) -> Non
     })
     assert response.status_code == 409
     assert response.json()["error"]["code"] == "LIBRARY_EMPTY"
+
+
+@pytest.mark.anyio
+async def test_candidate_document_limit_error_is_explicit(api: httpx2.AsyncClient) -> None:
+    response = await api.post("/v1/candidate-sources", headers=HEADERS, json={
+        "fileName": "long.txt",
+        "contentBase64": b64encode(b"A" * (MAX_DOCUMENT_TEXT + 1)).decode(),
+    })
+    assert response.status_code == 413
+    assert response.json()["error"]["code"] == "CANDIDATE_DOCUMENT_LIMIT_EXCEEDED"
 
 
 @pytest.mark.anyio

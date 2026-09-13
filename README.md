@@ -6,6 +6,12 @@ Kiwi Career Copilot began as a browser extension for my own job search after mov
 
 This repository is an active V2 product milestone, not a finished commercial service. The Agent and Career Library slice works end to end; the persistent job workspace and full CV/material editor remain future product stages.
 
+## Release status
+
+The Chrome Web Store currently distributes V1 `0.8.0`. The current source, CI and generated packages target V2 `2.0.0` for local development and internal review only; V2 has not been submitted to the store.
+
+[`store/chrome/`](store/chrome/README.md) and [`site/`](site/README.md) are retained V1 publication materials. A future V2 store release requires a fresh review of delivery, permissions, data disclosures and onboarding rather than reuse of the V1 release checklist.
+
 ## Why I built it
 
 I arrived in New Zealand as an international student and used SEEK for the first time while looking for part-time work. I had not updated my CV for years and had never needed to write a cover letter in my previous job searches in China. I also had several CVs for different purposes, plus visa conditions, a university timetable and project evidence spread across files.
@@ -155,14 +161,11 @@ Manual product validation has used real SEEK listings and private local sources 
 - Image-only PDFs require OCR before upload.
 - The local service still requires manual setup.
 - The full Jobs workspace, multi-CV variant editor and mature material workflow are not complete.
-- V2 has not been submitted to the Chrome Web Store; its data disclosures differ materially from V1.
 
 ## Project documentation
 
-- [Project showcase](docs/showcase/README.md)
+- [Stage 2 project showcase snapshot](docs/showcase/README.md)
 - [Technical deep dive](docs/showcase/technical-deep-dive.md)
-- [Interview Q&A](docs/showcase/interview-qa.md)
-- [Short application note](docs/showcase/show-us-what-you-built.md)
 - [V2 current state](docs/v2/current-state.md)
 - [V2 architecture](docs/v2/architecture.md)
 - [Product and engineering decisions](docs/v2/decisions.md)

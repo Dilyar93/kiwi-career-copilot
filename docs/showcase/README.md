@@ -1,8 +1,10 @@
 # Kiwi Career Copilot — Project Showcase
 
+> Portfolio snapshot: frozen at the end of V2 Stage 2 for internship applications and interviews. It documents that working milestone, not the current development backlog or a finished commercial release. For the live project state, see [V2 current state](../v2/current-state.md).
+
 Kiwi Career Copilot is a local-first Chrome extension and AI agent that helps a job seeker understand a role, investigate relevant personal evidence and decide what to do next.
 
-This showcase describes a working product slice, not a finished commercial service. The project is driven by my own job search after moving to New Zealand and has been tested with real SEEK listings and real career documents.
+This showcase describes the working product slice completed through Stage 2, not a finished commercial service. The project is driven by my own job search after moving to New Zealand and was tested with real SEEK listings and real career documents before this snapshot was frozen.
 
 ## The problem
 
@@ -99,7 +101,5 @@ The project does not claim recommendation accuracy from a synthetic benchmark. C
 ## Read next
 
 - [Technical deep dive](technical-deep-dive.md)
-- [Interview Q&A](interview-qa.md)
-- [Short application note: Show us what you’ve built — Why this interests me](show-us-what-you-built.md)
 - [Current product state](../v2/current-state.md)
 - [Current architecture](../v2/architecture.md)

@@ -6,7 +6,12 @@ import pytest
 from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 
-from .candidate_import import CandidateDocumentError, extract_candidate_document
+from .candidate_import import (
+    MAX_DOCUMENT_TEXT,
+    MAX_PDF_PAGES,
+    CandidateDocumentError,
+    extract_candidate_document,
+)
 from .models import CandidateImportRequest
 
 
@@ -44,6 +49,19 @@ def test_rejects_unsupported_or_disguised_documents() -> None:
         extract_candidate_document(request("cv.doc", b"legacy document content"))
     with pytest.raises(CandidateDocumentError, match="unreadable"):
         extract_candidate_document(request("cv.pdf", b"not really a pdf"))
+
+
+def test_rejects_documents_that_exceed_import_limits() -> None:
+    with pytest.raises(CandidateDocumentError, match="limit-exceeded"):
+        extract_candidate_document(request("long.txt", b"A" * (MAX_DOCUMENT_TEXT + 1)))
+
+    writer = PdfWriter()
+    for _ in range(MAX_PDF_PAGES + 1):
+        writer.add_blank_page(width=612, height=792)
+    content = BytesIO()
+    writer.write(content)
+    with pytest.raises(CandidateDocumentError, match="limit-exceeded"):
+        extract_candidate_document(request("long.pdf", content.getvalue()))
 
 
 def test_extracts_selectable_pdf_text() -> None:

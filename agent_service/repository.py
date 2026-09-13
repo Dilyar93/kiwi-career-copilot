@@ -82,6 +82,42 @@ CREATE TABLE claim_resolutions (
 """
 
 
+def _purge_disallowed_sensitive_claims(
+    connection: sqlite3.Connection,
+    source_id: str | None = None,
+) -> None:
+    parameters: tuple[str, ...] = (source_id,) if source_id else ()
+    source_filter = "AND claims.source_id = ?" if source_id else ""
+    claim_ids = tuple(
+        row["id"]
+        for row in connection.execute(
+            f"""SELECT claims.id FROM source_claims AS claims
+            JOIN candidate_sources AS sources ON sources.id = claims.source_id
+            WHERE sources.sensitivity = 'highly-sensitive'
+              AND claims.category IN ('identity', 'contact')
+              {source_filter}""",
+            parameters,
+        ).fetchall()
+    )
+    if not claim_ids:
+        return
+    stale_resolutions = [
+        row["conflict_id"]
+        for row in connection.execute(
+            "SELECT conflict_id, claim_ids_json FROM claim_resolutions",
+        ).fetchall()
+        if set(claim_ids).intersection(json.loads(row["claim_ids_json"]))
+    ]
+    connection.executemany(
+        "DELETE FROM claim_resolutions WHERE conflict_id = ?",
+        [(conflict_id,) for conflict_id in stale_resolutions],
+    )
+    connection.execute(
+        f"DELETE FROM source_claims WHERE id IN ({','.join('?' for _ in claim_ids)})",
+        claim_ids,
+    )
+
+
 def _source_chunks(text: str, max_chars: int = 1_200) -> list[tuple[int, int, str]]:
     chunks: list[tuple[int, int, str]] = []
     lines = text.splitlines()
@@ -118,7 +154,7 @@ def open_database(path: Path) -> sqlite3.Connection:
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA foreign_keys = ON")
     version = connection.execute("PRAGMA user_version").fetchone()[0]
-    if version > 7:
+    if version > 8:
         connection.close()
         raise RuntimeError(f"Database version {version} is newer than this service supports")
     if version == 0:
@@ -140,7 +176,7 @@ def open_database(path: Path) -> sqlite3.Connection:
               updated_at TEXT NOT NULL
             );
             """ + SOURCE_SCHEMA + CLAIM_SCHEMA + """
-            PRAGMA user_version = 7;
+            PRAGMA user_version = 8;
             """,
         )
     elif version == 1:
@@ -195,17 +231,10 @@ def open_database(path: Path) -> sqlite3.Connection:
             PRAGMA user_version = 6;
             """,
         )
-    if 1 <= version <= 6:
-        connection.executescript(
-            """
-            DELETE FROM source_claims
-            WHERE category IN ('identity', 'contact')
-              AND source_id IN (
-                SELECT id FROM candidate_sources WHERE sensitivity = 'highly-sensitive'
-              );
-            PRAGMA user_version = 7;
-            """,
-        )
+    if 1 <= version <= 7:
+        with connection:
+            _purge_disallowed_sensitive_claims(connection)
+            connection.execute("PRAGMA user_version = 8")
     return connection
 
 
@@ -300,6 +329,7 @@ def update_candidate_source(
                     source_id,
                 ),
             )
+            _purge_disallowed_sensitive_claims(connection, source_id)
         else:
             connection.execute(
                 "UPDATE candidate_sources SET status = 'needs-attention' WHERE id = ?",
@@ -319,6 +349,7 @@ def update_candidate_source_metadata(
             WHERE id = ?""",
             (update.kind, json.dumps(update.purpose_tags), update.sensitivity, source_id),
         ).rowcount
+        _purge_disallowed_sensitive_claims(connection, source_id)
     if not changed:
         return None
     return next(source for source in load_candidate_sources(connection) if source.id == source_id)
@@ -428,7 +459,12 @@ def load_candidate_claims(
     *,
     ready_only: bool = False,
 ) -> list[CandidateSourceClaim]:
-    conditions = []
+    conditions = [
+        """NOT (
+        sources.sensitivity = 'highly-sensitive'
+        AND claims.category IN ('identity', 'contact')
+        )""",
+    ]
     parameters: list[str] = []
     if source_id:
         conditions.append("claims.source_id = ?")

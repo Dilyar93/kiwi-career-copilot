@@ -207,7 +207,7 @@ export type AgentApiErrorCode =
   | 'invalid-job'
   | 'clarification-invalid'
   | 'import-unsupported'
-  | 'import-too-large'
+  | 'import-document-limit'
   | 'import-no-text'
   | 'import-unreadable'
   | 'import-timeout'
@@ -353,7 +353,7 @@ function mappedError(code: string): AgentApiError {
     INVALID_CLARIFICATION: 'clarification-invalid',
     ANALYSIS_INPUTS_MISSING: 'clarification-invalid',
     CANDIDATE_FILE_UNSUPPORTED: 'import-unsupported',
-    CANDIDATE_FILE_TOO_LARGE: 'import-too-large',
+    CANDIDATE_DOCUMENT_LIMIT_EXCEEDED: 'import-document-limit',
     CANDIDATE_FILE_NO_TEXT: 'import-no-text',
     CANDIDATE_FILE_UNREADABLE: 'import-unreadable',
     CANDIDATE_IMPORT_TIMEOUT: 'import-timeout',
