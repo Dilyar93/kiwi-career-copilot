@@ -1,6 +1,6 @@
 # Kiwi Career Copilot
 
-> A local-first Chrome career agent for SEEK that investigates source-grounded evidence across multiple CVs and career documents.
+> A Chrome extension and AI agent for SEEK that investigates source-grounded evidence across multiple CVs and career documents.
 
 Kiwi Career Copilot began as a browser extension for my own job search after moving to New Zealand. V1 improved SEEK search results and reached the Chrome Web Store. V2 adds a Career Library and an AI agent that can decide what personal evidence to investigate, how deeply to retrieve it and when clarification is actually useful.
 
@@ -8,9 +8,9 @@ This repository is an active V2 product milestone, not a finished commercial ser
 
 ## Release status
 
-The Chrome Web Store currently distributes V1 `0.8.0`. The current source, CI and generated packages target V2 `2.0.0` for local development and internal review only; V2 has not been submitted to the store.
+The Chrome Web Store currently distributes V1 `0.8.0`. This repository currently targets V2 `2.0.0` for local development and internal review only; V2 has not been submitted to the store.
 
-[`store/chrome/`](store/chrome/README.md) and [`site/`](site/README.md) are retained V1 publication materials. A future V2 store release requires a fresh review of delivery, permissions, data disclosures and onboarding rather than reuse of the V1 release checklist.
+[`store/chrome/`](store/chrome/README.md) retains the V1 publication materials, while [`site/`](site/README.md) points to the separately deployed V1 policy site. A future V2 store release requires a fresh review of delivery, permissions, data disclosures and onboarding rather than reuse of the V1 release checklist.
 
 ## Why I built it
 
@@ -22,7 +22,7 @@ The difficult part was not generating more text. It was repeatedly deciding whet
 
 ### V1 — SEEK search enhancement
 
-The published first version adds negative filters, hidden/viewed job state and commute-aware filtering to SEEK. The Chrome Web Store recorded 39 downloads in one month. That is a small audience, but it turned the project into real distributed software and exposed browser navigation, permissions and product-interaction problems that a local demo would not reveal.
+The published first version adds negative filters, hidden/viewed job state and commute-aware filtering to SEEK. Shipping it through the Chrome Web Store turned the project into real distributed software and exposed browser navigation, permissions and product-interaction problems that a local demo would not reveal.
 
 ### V2 — Career Library and decision agent
 
@@ -166,10 +166,6 @@ Manual product validation has used real SEEK listings and private local sources 
 
 - [Stage 2 project showcase snapshot](docs/showcase/README.md)
 - [Technical deep dive](docs/showcase/technical-deep-dive.md)
-- [V2 current state](docs/v2/current-state.md)
-- [V2 architecture](docs/v2/architecture.md)
-- [Product and engineering decisions](docs/v2/decisions.md)
-- [Documentation index](docs/README.md)
 
 ## Development approach
 

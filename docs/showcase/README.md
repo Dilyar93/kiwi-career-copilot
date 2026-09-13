@@ -1,8 +1,8 @@
 # Kiwi Career Copilot — Project Showcase
 
-> Portfolio snapshot: frozen at the end of V2 Stage 2 for internship applications and interviews. It documents that working milestone, not the current development backlog or a finished commercial release. For the live project state, see [V2 current state](../v2/current-state.md).
+> Portfolio snapshot: frozen at the end of V2 Stage 2 for internship applications and interviews. It documents that working milestone, not the current development backlog or a finished commercial release. For the current repository status, see the [project README](../../README.md).
 
-Kiwi Career Copilot is a local-first Chrome extension and AI agent that helps a job seeker understand a role, investigate relevant personal evidence and decide what to do next.
+Kiwi Career Copilot is a Chrome extension backed by an AI agent that helps a job seeker understand a role, investigate relevant personal evidence and decide what to do next.
 
 This showcase describes the working product slice completed through Stage 2, not a finished commercial service. The project is driven by my own job search after moving to New Zealand and was tested with real SEEK listings and real career documents before this snapshot was frozen.
 
@@ -22,7 +22,7 @@ The difficult part was not generating more text. It was repeatedly answering que
 
 ### V1 — SEEK search enhancement
 
-The first version improved the SEEK results page with negative filters, hidden/viewed state and commute-aware filtering. I published it to the Chrome Web Store, where it received 39 downloads in one month.
+The first version improved the SEEK results page with negative filters, hidden/viewed state and commute-aware filtering. I published it to the Chrome Web Store, which put it in front of real users rather than keeping it as a local demo.
 
 V1 was deliberately simple, but shipping it exposed real browser-extension problems: changing page structures, navigation state, permissions, unclear injected controls and the difference between a feature that works and a product people can understand.
 
@@ -101,5 +101,4 @@ The project does not claim recommendation accuracy from a synthetic benchmark. C
 ## Read next
 
 - [Technical deep dive](technical-deep-dive.md)
-- [Current product state](../v2/current-state.md)
-- [Current architecture](../v2/architecture.md)
+- [Current project status and setup](../../README.md)

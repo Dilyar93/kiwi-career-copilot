@@ -1,6 +1,6 @@
 # Technical Deep Dive
 
-> Stage 2 portfolio snapshot. This document is frozen for internship and interview use; current development facts live in [V2 current state](../v2/current-state.md).
+> Stage 2 portfolio snapshot. This document is frozen for internship and interview use; current repository status lives in the [project README](../../README.md).
 
 This document explains the implemented Agent and Career Library slice of Kiwi Career Copilot. Planned capabilities are deliberately excluded or identified as future work.
 

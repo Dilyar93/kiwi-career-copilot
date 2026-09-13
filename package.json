@@ -1,6 +1,6 @@
 {
   "name": "job-filter-extension",
-  "description": "Local-first SEEK career copilot for job decisions, application materials, and focused search controls.",
+  "description": "SEEK career copilot for job decisions, application materials, and focused search controls.",
   "private": true,
   "version": "2.0.0",
   "type": "module",
